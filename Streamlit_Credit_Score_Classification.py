@@ -18,6 +18,10 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 # Title the app
 st.title('Credit Score Classification')
 
+# Add a picture to the header
+header_image = "credit-score.jpeg" 
+st.image(header_image, use_column_width=True)
+
 
 # Load data
 df_train = pd.read_csv("train.csv", low_memory=False)
@@ -27,27 +31,15 @@ df_test = pd.read_csv("test.csv", low_memory=False)
 # Set up the sidebar
 st.sidebar.title('Developer Information')
 st.sidebar.text('Welcome to my Streamlit app!')
-
 # Display name at the top of the sidebar
 st.sidebar.subheader('Developer:')
-st.sidebar.text('Zohreh Taghibakhsh')
-
+st.sidebar.text('Zohreh Taghibakhshi')
 #link to GitHub profile
-st.sidebar.markdown('[GitHub](https://github.com/your_username)')
-
-st.subheader('Plot')
-# dropdown menu to the sidebar
-selected_option = st.sidebar.selectbox('Select a Plot to Display', ['Histogram for Age', 'Count Plot for Occupation', 'Correlation Heatmap', 'Bar Plot of Annual Income', 
-                                                            'Scatterplot of Monthly Inhand Salary vs. Amount invested monthly' , 'Pie Chart of Occupation Counts',
-                                                            'Count Plot of Credit Mix'])
+st.sidebar.markdown('[GitHub](https://github.com/zizo155)')
 
 
-#dropdown menu for machine learning models
-selected_model = st.sidebar.selectbox('Select Machine Learning Model', ['Decision Tree', 'Random Forest', 'Gradient Boosting', 'KNN'])
 
 
-# Main content
-st.subheader(f'{selected_option}')
 
 # Display the head of the data
 st.subheader('Raw Data - Head')
@@ -55,7 +47,8 @@ st.write(df_train.head())
 
 # Display list of columns
 st.subheader('List of Columns')
-st.write(df_train.columns.tolist())
+columns_table = pd.DataFrame(df_train.columns.tolist(), columns=["Columns"])
+st.table(columns_table)
 
 
 # --------------------------------------------
@@ -199,10 +192,23 @@ df_test['Payment_Behaviour'] = df_test['Payment_Behaviour'].replace('!@9#%8', 'N
 df_train['Delay_from_due_date'] = df_train['Delay_from_due_date'].apply(lambda x: max(0, x))
 df_test['Delay_from_due_date'] = df_test['Delay_from_due_date'].apply(lambda x: max(0, x))
 
+st.markdown("<hr style='border:2px solid black'>", unsafe_allow_html=True)
+
+
+st.markdown("<h2 style='text-align: center;'>Plots</h2>", unsafe_allow_html=True)
+
+
+# dropdown menu to the sidebar
+selected_option = st.sidebar.selectbox('Select a Plot to Display', ['Histogram for Age', 'Count Plot for Occupation', 'Correlation Heatmap', 'Bar Plot of Annual Income', 
+                                                            'Scatterplot of Monthly Inhand Salary vs. Amount invested monthly' , 'Pie Chart of Occupation Counts',
+                                                            'Count Plot of Credit Mix'])
+
+# Main content
+st.subheader(f'{selected_option}')
+
 
 # Plots
 if selected_option == 'Histogram for Age':
-    st.subheader('Histogram for Age')
     fig, ax = plt.subplots()
     sns.histplot(df_train['Age'], kde=True, ax=ax)
     ax.set_title('Distribution of Age')
@@ -212,7 +218,6 @@ if selected_option == 'Histogram for Age':
 
 
 elif selected_option == 'Count Plot for Occupation':
-    st.subheader('Count Plot for Occupation')
     fig, ax = plt.subplots()
     sns.countplot(x='Occupation', data=df_train, hue='Occupation', palette='pastel', ax=ax)
     ax.set_title('Count of Individuals in Each Occupation')
@@ -221,7 +226,6 @@ elif selected_option == 'Count Plot for Occupation':
 
 
 elif selected_option == 'Correlation Heatmap':
-    st.subheader('Correlation Heatmap')
     fig, ax = plt.subplots(figsize=(12, 10))
     numeric_columns = df_train.select_dtypes(include=['float64', 'int64']).columns
     corr_matrix = df_train[numeric_columns].corr()
@@ -230,20 +234,17 @@ elif selected_option == 'Correlation Heatmap':
     st.pyplot(fig)
 
 elif selected_option == 'Bar Plot of Annual Income':
-    st.subheader('Bar Plot of Annual Income considering Credit score')
     fig, ax = plt.subplots()
     sns.barplot(x='Credit_Score', y='Annual_Income', data=df_train, estimator=np.median, ax=ax)
     st.pyplot(fig)
 
 elif selected_option == 'Scatterplot of Monthly Inhand Salary vs. Amount invested monthly':
-    st.subheader('Scatterplot of Monthly Inhand Salary vs. Amount invested monthly')
     fig, ax = plt.subplots()
     sns.scatterplot(x='Monthly_Inhand_Salary', y='Amount_invested_monthly', data=df_train, ax=ax)
     st.pyplot(fig)
 
 
 elif selected_option == 'Pie Chart of Occupation Counts':
-    st.subheader('Pie Chart of Occupation Counts')
     occupation_counts = df_train['Occupation'].value_counts()
     fig, ax = plt.subplots()
     ax.pie(occupation_counts, labels=occupation_counts.index, autopct='%1.1f%%', startangle=90)
@@ -251,7 +252,204 @@ elif selected_option == 'Pie Chart of Occupation Counts':
     st.pyplot(fig)
 
 elif selected_option == 'Count Plot of Credit Mix':
-    st.subheader('Count Plot of Credit Mix')
     fig, ax = plt.subplots()
     sns.countplot(x='Credit_Mix', data=df_train, order=df_train['Credit_Mix'].value_counts().index, hue='Credit_Mix', ax=ax, palette='pastel')
     st.pyplot(fig)
+
+# Draw a line to separate the plots from machine learning part
+st.markdown("<hr style='border:2px solid black'>", unsafe_allow_html=True)
+
+# Machine Learning Section Header
+st.markdown("<h2 style='text-align:center;'>Machine Learning</h2>", unsafe_allow_html=True)
+
+machine_learning_image = "Machine_Learning.jpeg" 
+st.image(machine_learning_image, use_column_width=True)
+
+st.markdown("<p style='text-align:center;'>Please select a machine learning model from the sidebar dropdown and click on the button below it to run the selected model.</p>", unsafe_allow_html=True)
+
+
+st.markdown("<hr style='border:1px solid gray'>", unsafe_allow_html=True)
+
+# Machine Learning 
+
+#dropdown menu for machine learning models
+selected_model = st.sidebar.selectbox('Select a machine learning model',
+                                      ['Decision Tree', 
+                                       'Random Forest', 
+                                       'Gradient Boosting', 
+                                       'k-Nearest Neighbors'])
+
+df_train.drop(['Month', 'Occupation', 'Type_of_Loan', 'Payment_of_Min_Amount'], axis=1, inplace=True)
+df_test.drop(['Month', 'Occupation', 'Type_of_Loan', 'Payment_of_Min_Amount'], axis=1, inplace=True)
+
+# One-hot encode the object columns
+df_train = pd.get_dummies(df_train, columns=['Credit_Mix', 'Payment_Behaviour'])
+df_test = pd.get_dummies(df_test, columns=['Credit_Mix', 'Payment_Behaviour'])
+
+# Initialize StandardScaler
+scaler = StandardScaler()
+
+# Define numeric columns
+cols = ['Age', 'Annual_Income', 'Monthly_Inhand_Salary','Changed_Credit_Limit', 'Num_Credit_Inquiries',
+                'Outstanding_Debt', 'Credit_Utilization_Ratio', 'Total_EMI_per_month',
+                'Amount_invested_monthly', 'Monthly_Balance', 'Credit_History_Age_Months']
+
+# Apply StandardScaler to training data
+df_train[cols] = scaler.fit_transform(df_train[cols])
+
+# Apply the same scaler to test data
+df_test[cols] = scaler.transform(df_test[cols])
+
+# Create a LabelEncoder object
+label_encoder = LabelEncoder()
+
+# Apply label encoding to the "Credit_Score" column
+df_train['Credit_Score'] = label_encoder.fit_transform(df_train['Credit_Score'])
+
+# Prepare Data
+X = df_train.drop('Credit_Score', axis=1)
+y = df_train['Credit_Score']
+X_test = df_test.copy()
+
+# Train-Test Split
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+# Perform the selected machine learning model
+if st.sidebar.button('Run Selected Model'):
+    if selected_model == 'Decision Tree':
+        # Run Decision Tree model
+        st.markdown("<p style='text-align:center;'>Performing Decision Tree model...</p>", unsafe_allow_html=True)
+
+        # Build and Train the Decision Tree Model
+        dt_model = DecisionTreeClassifier(random_state=42)
+        dt_model.fit(X_train, y_train)
+        # Predictions on Validation Set
+        y_pred_val_dt = dt_model.predict(X_val)
+        # Evaluation
+        val_accuracy_dt = accuracy_score(y_val, y_pred_val_dt)
+        st.write(f'Validation Accuracy: {val_accuracy_dt:.4f}')
+        # Confusion Matrix
+        cm = confusion_matrix(y_val, y_pred_val_dt)
+        st.write("Confusion Matrix:")
+        st.write(cm)
+
+        # Classification Report
+        # Parse and format the classification report
+        report_dict_dt = classification_report(y_val, y_pred_val_dt, output_dict=True)
+        report_df_dt = pd.DataFrame(report_dict_dt).transpose()
+
+        # Display the formatted classification report
+        st.write("Classification Report:")
+        st.write(report_df_dt)
+        
+        # Predict for Unseen Data (df_test)
+        predictions_test_dt = dt_model.predict(X_test)
+
+    elif selected_model == 'Random Forest':
+        # Run Random Forest model
+        st.markdown("<p style='text-align:center;'>Performing Random Forest model...</p>", unsafe_allow_html=True)
+
+        # Build and Train the Random Forest Model
+        rf_model = RandomForestClassifier(random_state=42)
+        rf_model.fit(X_train, y_train)
+        # Predictions on Validation Set
+        y_pred_val_rf = rf_model.predict(X_val)
+        # Evaluation
+        val_accuracy_rf = accuracy_score(y_val, y_pred_val_rf)
+        st.write(f'Validation Accuracy (Random Forest): {val_accuracy_rf:.4f}')
+        # Confusion Matrix
+        cm_rf = confusion_matrix(y_val, y_pred_val_rf)
+        st.write("Confusion Matrix (Random Forest):")
+        st.write(cm_rf)
+
+        # Classification Report
+        # Parse and format the classification report
+        report_dict_rf = classification_report(y_val, y_pred_val_rf, output_dict=True)
+        report_df_rf = pd.DataFrame(report_dict_rf).transpose()
+
+        # Display the formatted classification report
+        st.write("Classification Report:")
+        st.write(report_df_rf)
+
+
+        # Predict for Unseen Data (df_test) using Random Forest
+        predictions_test_rf = rf_model.predict(X_test)
+
+
+    elif selected_model == 'Gradient Boosting':
+        # Run Gradient Boosting model
+        st.markdown("<p style='text-align:center;'>Performing Gradient Boosting model...</p>", unsafe_allow_html=True)
+
+        # Build and Train the Gradient Boosting Model
+        gb_model = GradientBoostingClassifier(random_state=42)
+        gb_model.fit(X_train, y_train)
+        # Predictions on Validation Set
+        y_pred_val_gb = gb_model.predict(X_val)
+        # Evaluation
+        val_accuracy_gb = accuracy_score(y_val, y_pred_val_gb)
+        st.write(f'Validation Accuracy (Gradient Boosting): {val_accuracy_gb:.4f}')
+        # Confusion Matrix
+        cm_gb = confusion_matrix(y_val, y_pred_val_gb)
+        st.write("Confusion Matrix (Gradient Boosting):")
+        st.write(cm_gb)
+        
+        # Classification Report
+        # Parse and format the classification report
+        report_dict_gb = classification_report(y_val, y_pred_val_gb, output_dict=True)
+        report_df_gb = pd.DataFrame(report_dict_gb).transpose()
+
+        # Display the formatted classification report
+        st.write("Classification Report:")
+        st.write(report_df_gb)
+
+        # Predict for Unseen Data (df_test) using Gradient Boosting
+        predictions_test_gb = gb_model.predict(X_test)
+
+    elif selected_model == 'k-Nearest Neighbors':
+        # Run k-Nearest Neighbors model
+        st.markdown("<p style='text-align:center;'>Performing k-Nearest Neighbors model...</p>", unsafe_allow_html=True)
+
+        # Build and Train the k-Nearest Neighbors Model
+        knn_model = KNeighborsClassifier()
+        knn_model.fit(X_train, y_train)
+        # Predictions on Validation Set
+        y_pred_val_knn = knn_model.predict(X_val)
+        # Evaluation
+        val_accuracy_knn = accuracy_score(y_val, y_pred_val_knn)
+        st.write(f'Validation Accuracy (k-Nearest Neighbors): {val_accuracy_knn:.4f}')
+        # Confusion Matrix
+        cm_knn = confusion_matrix(y_val, y_pred_val_knn)
+        st.write("Confusion Matrix (k-Nearest Neighbors):")
+        st.write(cm_knn)
+
+        # Classification Report
+        # Parse and format the classification report
+        report_dict_knn = classification_report(y_val, y_pred_val_knn, output_dict=True)
+        report_df_knn = pd.DataFrame(report_dict_knn).transpose()
+
+        # Display the formatted classification report
+        st.write("Classification Report:")
+        st.write(report_df_knn)
+
+        # Predict for Unseen Data (df_test) using k-Nearest Neighbors
+        predictions_test_knn = knn_model.predict(X_test)
+
+
+
+
+
+
+st.markdown("<hr style='border:1px solid gray'>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center;'>Models Accuracy Comparison</h2>", unsafe_allow_html=True)
+model_accuracy_image = "model_accuracy.png" 
+st.image(model_accuracy_image, use_column_width=True)
+
+st.markdown("<br>", unsafe_allow_html=True)  
+st.markdown("<hr style='border:2px solid gray'>", unsafe_allow_html=True) 
+
+
+st.markdown("<p style='text-align: center; font-size: 16px;'>Explore the full dataset on Kaggle:</p>", unsafe_allow_html=True)
+
+
+st.markdown("<p style='text-align: center; font-size: 16px;'><a href='https://www.kaggle.com/datasets/parisrohan/credit-score-classification/' target='_blank'>Kaggle Dataset</a></p>", unsafe_allow_html=True)
